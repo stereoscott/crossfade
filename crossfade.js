@@ -6,34 +6,27 @@ Crossfade.prototype = {
 
   initialize: function(options) {
     this.options = Object.extend({
-      imagePath:  '#photofader img',
-      caption:    'caption',
-      author:     null,
-      showLink:  null,
+      imagePath:  '#photofader .photo',
+      title:      '#photocaption',
+      alt:        '#photoalt',
+      showLink:   null,
       fadeTime:   5,
       linkContainer: null
     }, options || {});
 
-    this.caption = $(this.options.caption);
-    this.author = $(this.options.author);
+    this.title = $(this.options.title);
+    this.alt = $(this.options.alt);
     this.showLink = $(this.options.showLink);
     this.linkContainer = $(this.options.linkContainer);
     this.current = 0;
 
     this.imagelinks = $$(this.options.imagePath);
 
-    /*
     for(i = 0; i < this.imagelinks.length; i++) {
       if(i != 0) {
-        Element.setOpacity(this.imagelinks[i], 0.0);
-        Element.setStyle(this.imagelinks[i], { display: 'block' });
-
-        //Element.hide(this.imagelinks[i]).setOpacity(0.0);
-        //Element.setStyle(this.imagelinks[i], { display: 'none' });
-        
+        Element.hide(this.imagelinks[i]).setOpacity(0.0);        
       }
     }
-    */
     //this.swapFade();
     this.initTimer();
   }, 
@@ -48,34 +41,42 @@ Crossfade.prototype = {
     Effect.Appear(this.imagelinks[next], { duration: 1, from: 0, to: 1.0, queue: { scope: 'fader'}});
     
     this.current = next;
+    var nextImage = this.nextImage(next);
+        
+    if (this.title) {
+      var nextTitle = nextImage.getAttribute('title');
+      if (nextTitle) {
+        Element.update(this.title, nextTitle);
+      } else {
+        Element.update(this.title, '');
+      }
+    }
+    if (this.alt) {
+      var nextAlt = nextImage.getAttribute('alt');
+      if (nextAlt) {
+        Element.update(this.alt, nextAlt);
+      } else {
+        Element.update(this.alt, '');
+      }
+    }
     
-    if (this.caption) {
-      var nextCaption = this.imagelinks[next].getAttribute('title');
-      if (nextCaption) {
-        Element.update(this.caption, nextCaption);
-      } else {
-        Element.update(this.caption, '');
-      }
-    }
-    if (this.author) {
-      var nextAuthor = this.imagelinks[next].getAttribute('author');
-      if (nextAuthor) {
-        Element.update(this.author, nextAuthor);
-      } else {
-        Element.update(this.author, '');
-      }
-    }
     if (this.showLink) {
-      var nextUrl = this.imagelinks[next].parentNode.getAttribute('href');
+      var nextUrl = nextImage.up('a').getAttribute('href');
       if (nextUrl) {
         this.showLink.href = nextUrl;
       }
     }
+    
     if (this.linkContainer) {
       this.highlightLink(next);
     }
   },
-
+  
+  nextImage: function(next) {
+    var element = this.imagelinks[next];
+    return element.match('img') ? element : element.down('img');
+  },
+  
   goto: function(i) {
     this.stop();
     this.fadeInto(i);
@@ -110,12 +111,16 @@ Crossfade.prototype = {
     }
 
     this.fadeInto(previous);
+    
+    return false;
   },
   
   next: function() {
     this.stop(); //cancel pending timer
     this.swapFade();
     this.startTimer(); //do a quick fade NOW and resume timer
+    
+    return false;
   },
   
   stop: function() {
@@ -132,6 +137,8 @@ Crossfade.prototype = {
   startStop: function() {
     if (this.timer.timer == null) this.start();
     else this.stop();
+    
+    return false;
   },
   
   initTimer: function() {
