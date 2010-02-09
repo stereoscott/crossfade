@@ -1,0 +1,57 @@
+This is a small script that uses prototype and scriptaculous to cross fade images. It also includes support for simple controls, like back, forward, start, stop, and goto. 
+
+It is unobtrusive, and degrades gracefully in browsers that do not have javascript support.
+
+Sample syntax:
+
+1. Include the JS files:
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/prototype/1.6.1.0/prototype.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/scriptaculous/1.8.3/effects.js"></script>
+<script type="text/javascript" src="js/crossfade.js"></script>
+
+2. add the necessary styles to make sure images in the image holder are absolutely positioned:
+<style>
+#newshomeimg img {
+  position:absolute;
+  border: none;
+}
+#newscaption {
+  display: inline;
+}
+</style>
+
+3. Make sure the image holder, title, caption, and "read more" link all have ids. Add all of the images into the image holder div, adding display:none to all but the first one. Since these images have "read more" links, wrap them in an a tag. This will define what URL to use. Add display:none to all images but the first. Use the javascript commands in the links for image navigation. Note that the caption is stored in the img "title" attribute, and the title is stored in the image "author" attribute (this is left over from when it was integrated with the lightwindow).
+
+<div id="newshomeimg">
+  <a href="#boat"><img src="images/boat_cruise.jpg" title="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam..." alt="Boat Cruise "/></a>
+  <a href="#golf"><img src="images/golf_outing.jpg" style="display:none" title="The Eastern Michigan University Golf Outing was played at Eagle Crest Golf Club in Ypsilanti,Michigan and was a huge success.." alt="EMU Hockey Golf Scramble"/></a>
+</div>
+<div id="newscapbox">
+  <div class="newsboxcontent">
+    <h2 id="newstitle">EMU Hockey Boat Cruise</h2>
+    <p id="newscaption">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam...</p><a id="newslink" href="#">Story</a>
+  <p> <a href="news.html" style="float:right;">RECENT NEWS</a>
+  <a href="#" onclick="return crossfader.previous();" class="control">&lt; PREV</a> &nbsp; &nbsp; &nbsp;
+  <a href="#" onclick="return crossfader.startStop();" class="control">II</a> &nbsp; &nbsp; &nbsp;
+  <a href="#" onclick="return crossfader.next()" class="control">NEXT &gt;</a>
+  </p>
+  </div>
+</div>
+
+
+4. Set up the crossfader to initialize on page load, passing in the ids and paths to the images, captions, titles.
+<script>
+var crossfader;
+Event.observe(window, 'load', function() {
+  crossfader = new Crossfade({
+		imagePath:  '#newshomeimg a img',
+		alt:    'newscaption',
+		title:     'newstitle', 
+		showLink:   'newslink',
+		fadeTime:   5
+  });
+});
+</script>
+
+
